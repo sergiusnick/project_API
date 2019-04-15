@@ -5,7 +5,7 @@ import requests
 import sys
 import os
 pygame.init()
-screen = pygame.display.set_mode((600, 450))
+screen = pygame.display.set_mode((600, 500))
 clock = pygame.time.Clock()
 FPS = 100
 # список городов которые будут в игре
@@ -139,7 +139,7 @@ mode_city_sights_image = pygame.transform.scale(load_image('city_sights.png'), (
 
 
 def start_screen():
-    fon = pygame.transform.scale(load_image('fon.jpg'), (600, 450))
+    fon = pygame.transform.scale(load_image('fon.jpg'), (600, 500))
     play = Play()
     rules = Rules()
     settings = Settings()
@@ -192,7 +192,7 @@ def start_screen():
 
 
 def choose_mode():
-    fon = pygame.transform.scale(load_image('fon.jpg'), (600, 450))
+    fon = pygame.transform.scale(load_image('fon.jpg'), (600, 500))
     mode_capitals = ModeCapitals()
     mode_russian_cities = ModeRussianCities()
     mode_city_sights = ModeCitySights()
@@ -242,10 +242,10 @@ def choose_mode():
 
 
 def rules_screen():
-    fon = pygame.transform.scale(load_image('fon.jpg'), (600, 450))
+    fon = pygame.transform.scale(load_image('fon.jpg'), (600, 500))
     screen.blit(fon, (0, 0))
     rules = Rules()
-    rules.rect = rules.image.get_rect().move(150, 300)
+    rules.rect = rules.image.get_rect().move(150, 320)
     font = pygame.font.SysFont('bookmanoldstyle', 50)
     rules_group.draw(screen)
     string_rendered = font.render('Назад', 1, pygame.Color('white'))
@@ -269,11 +269,11 @@ def rules_screen():
 
 def settings_screen():
     # тут будут настройки, пока не знаю какие
-    fon = pygame.transform.scale(load_image('fon.jpg'), (600, 450))
+    fon = pygame.transform.scale(load_image('fon.jpg'), (600, 500))
     screen.blit(fon, (0, 0))
     settings = Settings()
     font = pygame.font.SysFont('bookmanoldstyle', 50)
-    settings.rect = settings.image.get_rect().move(150, 300)
+    settings.rect = settings.image.get_rect().move(150, 320)
     settings_group.draw(screen)
     string_rendered = font.render('Назад', 1, pygame.Color('white'))
     intro_rect = string_rendered.get_rect()
@@ -296,7 +296,7 @@ def settings_screen():
 
 def game(mode):
     # пока что тут полежит котик
-    fon = pygame.transform.scale(load_image('cat.jpg'), (600, 450))
+    fon = pygame.transform.scale(load_image('cat.jpg'), (600, 500))
     screen.blit(fon, (0, 0))
     pygame.display.flip()
 
@@ -305,7 +305,7 @@ class Play(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(play_group, all_sprites)
         self.image = play_image
-        self.rect = self.image.get_rect().move(150, 50)
+        self.rect = self.image.get_rect().move(150, 80)
 
     def get_event(self, event):
         if self.rect.collidepoint(event.pos):
@@ -317,7 +317,7 @@ class Rules(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(rules_group, all_sprites)
         self.image = rules_image
-        self.rect = self.image.get_rect().move(150, 170)
+        self.rect = self.image.get_rect().move(150, 200)
 
     def get_event(self, event):
         if self.rect.collidepoint(event.pos):
@@ -329,7 +329,7 @@ class Settings(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(settings_group, all_sprites)
         self.image = settings_image
-        self.rect = self.image.get_rect().move(150, 290)
+        self.rect = self.image.get_rect().move(150, 320)
 
     def get_event(self, event):
         if self.rect.collidepoint(event.pos):
@@ -341,7 +341,7 @@ class ModeCapitals(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(mode_capitals_group, all_sprites)
         self.image = mode_capitals_image
-        self.rect = self.image.get_rect().move(150, 50)
+        self.rect = self.image.get_rect().move(150, 80)
 
     def get_event(self, event):
         if self.rect.collidepoint(event.pos):
@@ -353,7 +353,7 @@ class ModeRussianCities(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(mode_russian_cities_group, all_sprites)
         self.image = mode_russian_cities_image
-        self.rect = self.image.get_rect().move(150, 170)
+        self.rect = self.image.get_rect().move(150, 200)
 
     def get_event(self, event):
         if self.rect.collidepoint(event.pos):
@@ -365,7 +365,7 @@ class ModeCitySights(pygame.sprite.Sprite):
     def __init__(self):
         super().__init__(mode_city_sights_group, all_sprites)
         self.image = mode_city_sights_image
-        self.rect = self.image.get_rect().move(150, 290)
+        self.rect = self.image.get_rect().move(150, 320)
 
     def get_event(self, event):
         if self.rect.collidepoint(event.pos):
@@ -383,7 +383,7 @@ mode_city_sights_group = pygame.sprite.Group()
 
 def main():
     #pygame.init()
-    #screen = pygame.display.set_mode((600, 450))
+    #screen = pygame.display.set_mode((600, 500))
     running = True
     mode = start_screen()
     print(mode)
