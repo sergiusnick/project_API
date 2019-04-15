@@ -4,6 +4,10 @@ import pygame
 import requests
 import sys
 import os
+pygame.init()
+screen = pygame.display.set_mode((600, 450))
+clock = pygame.time.Clock()
+FPS = 100
 # список городов которые будут в игре
 
 # режим: столицы
@@ -13,7 +17,7 @@ capitals = ['Амстердам', 'Андорра-ла-Велья', 'Афины'
 russian_cities = ['Москва', 'Санкт-Петербург', 'Новосибирск', 'Екатеринбург', 'Нижний Новгород', 'Казань', 'Челябинск', 'Омск', 'Самара', 'Ростов-на-Дону', 'Уфа', 'Красноярск', 'Воронеж', 'Пермь', 'Волгоград', 'Краснодар', 'Саратов', 'Тюмень', 'Тольятти', 'Ижевск', 'Барнаул', 'Ульяновск', 'Иркутск', 'Хабаровск', 'Ярославль', 'Владивосток', 'Махачкала', 'Томск', 'Оренбург', 'Кемерово', 'Новокузнецк', 'Рязань', 'Астрахань', 'Набережные Челны', 'Пенза', 'Липецк', 'Киров', 'Чебоксары', 'Тула', 'Калининград', 'Балашиха', 'Курск', 'Севастополь', 'Сочи', 'Улан-Удэ', 'Ставрополь', 'Тверь', 'Магнитогорск', 'Брянск', 'Иваново', 'Белгород', 'Сургут', 'Владимир', 'Нижний Тагил', 'Архангельск', 'Чита', 'Симферополь', 'Калуга', 'Смоленск', 'Волжский', 'Саранск', 'Череповец', 'Курган', 'Орёл', 'Вологда', 'Якутск', 'Владикавказ', 'Подольск', 'Грозный', 'Мурманск', 'Тамбов', 'Петрозаводск', 'Стерлитамак', 'Кострома', 'Нижневартовск', 'Новороссийск', 'Йошкар-Ола', 'Химки', 'Таганрог', 'Комсомольск-на-Амуре', 'Сыктывкар', 'Нижнекамск', 'Нальчик', 'Шахты', 'Дзержинск', 'Орск', 'Братск', 'Энгельс', 'Ангарск', 'Благовещенск', 'Королёв', 'Старый Оскол', 'Великий Новгород', 'Мытищи', 'Псков', 'Люберцы', 'Бийск', 'Южно-Сахалинск', 'Прокопьевск', 'Армавир', 'Балаково', 'Рыбинск', 'Абакан', 'Северодвинск', 'Петропавловск-Камчатский', 'Норильск', 'Уссурийск', 'Волгодонск', 'Сызрань', 'Новочеркасск', 'Каменск-Уральский', 'Златоуст', 'Красногорск', 'Электросталь', 'Альметьевск', 'Салават', 'Миасс', 'Керчь', 'Находка', 'Копейск', 'Пятигорск', 'Коломна', 'Рубцовск', 'Березники', 'Хасавюрт', 'Майкоп', 'Одинцово', 'Ковров', 'Кисловодск', 'Домодедово', 'Нефтекамск', 'Нефтеюганск', 'Новочебоксарск', 'Батайск', 'Щёлково', 'Серпухов', 'Новомосковск', 'Дербент', 'Черкесск', 'Первоуральск', 'Орехово-Зуево', 'Кызыл', 'Обнинск', 'Назрань', 'Невинномысск', 'Новый Уренгой', 'Каспийск', 'Раменское', 'Димитровград', 'Октябрьский', 'Долгопрудный', 'Камышин', 'Муром', 'Ессентуки', 'Новошахтинск', 'Жуковский', 'Евпатория', 'Северск', 'Реутов', 'Артём', 'Ноябрьск', 'Ачинск', 'Пушкино', 'Арзамас', 'Бердск', 'Сергиев Посад', 'Елец', 'Элиста', 'Ногинск', 'Новокуйбышевск', 'Железногорск']
 
 # режим: достопримечательности
-city_sights = ['Мачу-Пикчу', 'Мечеть шейха Зайда', 'Тадж-Махал', 'Мескита', 'Собор Святого Петра', 'Ангкор-Ват', 'Храмовый комплекс Байон', 'Собор Воскресения Христова на Крови', 'Геттисбергский национальный военный парк', 'Стены старого города', 'Пагода Шведагон', 'Мемориал Линкольна и Отражающий бассейн', 'Древний город Петра', 'Участок Великой Китайской стены Мутяньюй', 'Древний город Эфес', 'Альгамбра', 'Австралийский военный мемориал', 'Сиенский собор', 'Миланский собор (Дуомо)', 'Храм Святого Семейства', 'Мост «Золотые ворота»', 'Статуя Христа-Искупителя', 'Теотиуакан', 'Золотой Храм', 'Сиднейский оперный театр']
+city_sights = {'Мачу-Пикчу': 'machu_piсchu.jpg', 'Мечеть шейха Зайда': 'zaid.jpg', 'Тадж-Махал': 'taj_mahal.jpg', 'Мескита': 'meskita.jpg', 'Собор Святого Петра': 'st_paul.jpg', 'Ангкор-Ват': 'angkor.jpg', 'Храмовый комплекс Байон': 'baion.jpg', 'Собор Воскресения Христова на Крови': 'sobor_na_krovi.jpg', 'Геттисбергский национальный военный парк': 'gettysburg.jpg', 'Стены старого города': 'old_walls.jpg', 'Пагода Шведагон': 'shvedagon.jpg', 'Мемориал Линкольна и Отражающий бассейн': 'linkoln.jpg', 'Древний город Петра': 'old_peter.jpg', 'Участок Великой Китайской стены Мутяньюй': 'great_wall.jpg', 'Древний город Эфес': 'efes.jpg', 'Альгамбра': 'algambra.jpg', 'Австралийский военный мемориал': 'military_memorial.jpg', 'Сиенский собор': 'siena.jpg', 'Миланский собор (Дуомо)': 'milan.jpg', 'Храм Святого Семейства': 'sagrada_familia.jpg', 'Мост «Золотые ворота»': 'golden_gate.jpg', 'Статуя Христа-Искупителя': 'christ.jpg', 'Теотиуакан': 'teotihuacan.jpg', 'Золотой Храм': 'golden_temple.jpg', 'Сиднейский оперный театр': 'sidney_opera.jpg'}
 
 
 def lonlat_distance(a, b):
@@ -26,6 +30,10 @@ def lonlat_distance(a, b):
     dy = abs(a_lat - b_lat) * degree_to_meters_factor
     distance = math.sqrt(dx * dx + dy * dy)
     return distance
+
+def terminate():
+    pygame.quit()
+    sys.exit()
 
 
 class MapParams(object):
@@ -108,25 +116,285 @@ def load_map(mp):
     return map_file
 
 
-def main():
-    pygame.init()
-    screen = pygame.display.set_mode((600, 450))
+def load_image(name, colorkey=None):
+    fullname = os.path.join('data', name)
+    try:
+        image = pygame.image.load(fullname)
+    except pygame.error as message:
+        print('Cannot load image:', name)
+        raise SystemExit(message)
+    image = image.convert_alpha()
+    if colorkey is not None:
+        if colorkey is -1:
+            colorkey = image.get_at((0, 0))
+        image.set_colorkey(colorkey)
+    return image
 
-    mp = MapParams()
+play_image = pygame.transform.scale(load_image('play.png'), (300, 100))
+rules_image = pygame.transform.scale(load_image('rules.png'), (300, 100))
+settings_image = pygame.transform.scale(load_image('settings.png'), (300, 100))
+mode_capitals_image = pygame.transform.scale(load_image('capitals.png'), (300, 100))
+mode_russian_cities_image = pygame.transform.scale(load_image('russian_cities.png'), (300, 100))
+mode_city_sights_image = pygame.transform.scale(load_image('city_sights.png'), (300, 100))
+
+
+def start_screen():
+    fon = pygame.transform.scale(load_image('fon.jpg'), (600, 450))
+    play = Play()
+    rules = Rules()
+    settings = Settings()
+    screen.blit(fon, (0, 0))
+    font = pygame.font.SysFont('bookmanoldstyle', 50)
+    play_group.draw(screen)
+    rules_group.draw(screen)
+    settings_group.draw(screen)
+    string_rendered = font.render('Играть', 1, pygame.Color('white'))
+    intro_rect = string_rendered.get_rect()
+    intro_rect.x, intro_rect.top = play.rect.x + 65, play.rect.y + 20
+    screen.blit(string_rendered, intro_rect)
+    string_rendered = font.render('Правила', 1, pygame.Color('white'))
+    intro_rect = string_rendered.get_rect()
+    intro_rect.x, intro_rect.top = rules.rect.x + 45, rules.rect.y + 20
+    screen.blit(string_rendered, intro_rect)
+    string_rendered = font.render('Настройки', 1, pygame.Color('white'))
+    intro_rect = string_rendered.get_rect()
+    intro_rect.x, intro_rect.top = settings.rect.x + 15, settings.rect.y + 20
+    screen.blit(string_rendered, intro_rect)
+    pygame.display.flip()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                a = play.get_event(event)
+                b = rules.get_event(event)
+                c = settings.get_event(event)
+                if a:
+                    play_group.remove(play)
+                    rules_group.remove(rules)
+                    settings_group.remove(settings)
+                    mode = choose_mode()
+                    return mode
+                elif b:
+                    play_group.remove(play)
+                    rules_group.remove(rules)
+                    settings_group.remove(settings)
+                    mode = rules_screen()
+                    return mode
+                elif c:
+                    play_group.remove(play)
+                    rules_group.remove(rules)
+                    settings_group.remove(settings)
+                    mode = settings_screen()
+                    return mode
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
+def choose_mode():
+    fon = pygame.transform.scale(load_image('fon.jpg'), (600, 450))
+    mode_capitals = ModeCapitals()
+    mode_russian_cities = ModeRussianCities()
+    mode_city_sights = ModeCitySights()
+    screen.blit(fon, (0, 0))
+    mode_capitals_group.draw(screen)
+    mode_city_sights_group.draw(screen)
+    mode_russian_cities_group.draw(screen)
+    font = pygame.font.SysFont('bookmanoldstyle', 30)
+    play_group.draw(screen)
+    rules_group.draw(screen)
+    settings_group.draw(screen)
+    string_rendered = font.render('Столицы мира', 1, pygame.Color('white'))
+    intro_rect = string_rendered.get_rect()
+    intro_rect.x, intro_rect.top = mode_capitals.rect.x + 40, mode_capitals.rect.y + 20
+    screen.blit(string_rendered, intro_rect)
+    string_rendered = font.render('Города России', 1, pygame.Color('white'))
+    intro_rect = string_rendered.get_rect()
+    intro_rect.x, intro_rect.top = mode_russian_cities.rect.x + 40, mode_russian_cities.rect.y + 20
+    screen.blit(string_rendered, intro_rect)
+    string_rendered = font.render('Интересные места', 1, pygame.Color('white'))
+    intro_rect = string_rendered.get_rect()
+    intro_rect.x, intro_rect.top = mode_city_sights.rect.x + 10, mode_city_sights.rect.y + 20
+    screen.blit(string_rendered, intro_rect)
+    pygame.display.flip()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                a = mode_capitals.get_event(event)
+                b = mode_russian_cities.get_event(event)
+                c = mode_city_sights.get_event(event)
+                mode = ''
+                if a:
+                    mode = 'capitals'
+                elif b:
+                    mode = 'cities'
+                elif c:
+                    mode = 'sights'
+                if mode != '':
+                    mode_capitals_group.remove(mode_capitals)
+                    mode_city_sights_group.remove(mode_city_sights)
+                    mode_russian_cities_group.remove(mode_russian_cities)
+                    return mode
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
+def rules_screen():
+    fon = pygame.transform.scale(load_image('fon.jpg'), (600, 450))
+    screen.blit(fon, (0, 0))
+    rules = Rules()
+    rules.rect = rules.image.get_rect().move(150, 300)
+    font = pygame.font.SysFont('bookmanoldstyle', 50)
+    rules_group.draw(screen)
+    string_rendered = font.render('Назад', 1, pygame.Color('white'))
+    intro_rect = string_rendered.get_rect()
+    intro_rect.x, intro_rect.top = rules.rect.x + 70, rules.rect.y + 20
+    screen.blit(string_rendered, intro_rect)
+    pygame.display.flip()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                a = rules.get_event(event)
+                if a:
+                    rules_group.remove(rules)
+                    mode = start_screen()
+                    return mode
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
+def settings_screen():
+    # тут будут настройки, пока не знаю какие
+    fon = pygame.transform.scale(load_image('fon.jpg'), (600, 450))
+    screen.blit(fon, (0, 0))
+    settings = Settings()
+    font = pygame.font.SysFont('bookmanoldstyle', 50)
+    settings.rect = settings.image.get_rect().move(150, 300)
+    settings_group.draw(screen)
+    string_rendered = font.render('Назад', 1, pygame.Color('white'))
+    intro_rect = string_rendered.get_rect()
+    intro_rect.x, intro_rect.top = settings.rect.x + 70, settings.rect.y + 20
+    screen.blit(string_rendered, intro_rect)
+    pygame.display.flip()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                terminate()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                a = settings.get_event(event)
+                if a:
+                    settings_group.remove(settings)
+                    mode = start_screen()
+                    return mode
+        pygame.display.flip()
+        clock.tick(FPS)
+
+
+def game(mode):
+    # пока что тут полежит котик
+    fon = pygame.transform.scale(load_image('cat.jpg'), (600, 450))
+    screen.blit(fon, (0, 0))
+    pygame.display.flip()
+
+
+class Play(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(play_group, all_sprites)
+        self.image = play_image
+        self.rect = self.image.get_rect().move(150, 50)
+
+    def get_event(self, event):
+        if self.rect.collidepoint(event.pos):
+            return True
+        return False
+
+
+class Rules(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(rules_group, all_sprites)
+        self.image = rules_image
+        self.rect = self.image.get_rect().move(150, 170)
+
+    def get_event(self, event):
+        if self.rect.collidepoint(event.pos):
+            return True
+        return False
+
+
+class Settings(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(settings_group, all_sprites)
+        self.image = settings_image
+        self.rect = self.image.get_rect().move(150, 290)
+
+    def get_event(self, event):
+        if self.rect.collidepoint(event.pos):
+            return True
+        return False
+
+
+class ModeCapitals(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(mode_capitals_group, all_sprites)
+        self.image = mode_capitals_image
+        self.rect = self.image.get_rect().move(150, 50)
+
+    def get_event(self, event):
+        if self.rect.collidepoint(event.pos):
+            return True
+        return False
+
+
+class ModeRussianCities(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(mode_russian_cities_group, all_sprites)
+        self.image = mode_russian_cities_image
+        self.rect = self.image.get_rect().move(150, 170)
+
+    def get_event(self, event):
+        if self.rect.collidepoint(event.pos):
+            return True
+        return False
+
+
+class ModeCitySights(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(mode_city_sights_group, all_sprites)
+        self.image = mode_city_sights_image
+        self.rect = self.image.get_rect().move(150, 290)
+
+    def get_event(self, event):
+        if self.rect.collidepoint(event.pos):
+            return True
+        return False
+
+all_sprites = pygame.sprite.Group()
+play_group = pygame.sprite.Group()
+rules_group = pygame.sprite.Group()
+settings_group = pygame.sprite.Group()
+mode_capitals_group = pygame.sprite.Group()
+mode_russian_cities_group = pygame.sprite.Group()
+mode_city_sights_group = pygame.sprite.Group()
+
+
+def main():
+    #pygame.init()
+    #screen = pygame.display.set_mode((600, 450))
     running = True
+    mode = start_screen()
+    print(mode)
+    game(mode)
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-                break
-            mp.update(event)
-        map_file = load_map(mp)
-
-        screen.blit(pygame.image.load(map_file), (0, 0))
+        clock.tick(FPS)
         pygame.display.flip()
-
-    pygame.quit()
-    os.remove(map_file)
+    terminate()
 
 
 if __name__ == "__main__":
