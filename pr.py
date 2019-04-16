@@ -10,7 +10,6 @@ pygame.init()
 screen = pygame.display.set_mode((600, 500))
 
 choose_game_mode = True
-gamemodes = ['capitals']
 # список городов которые будут в игре
 
 # режим: столицы
@@ -78,7 +77,7 @@ sights = {'Мачу-Пикчу': 'machu_piсchu.jpg', 'Мечеть шейха �
           'Собор Святого Петра': 'st_paul.jpg', 'Ангкор-Ват': 'angkor.jpg',
           'Собор Воскресения Христова на Крови': 'sobor_na_krovi.jpg',
           'Пагода Шведагон': 'shvedagon.jpg',
-          'Мемориал Линкольна и Отражающий бассейн': 'linkoln.jpg',
+          'Мемориал Линкольна': 'linkoln.jpg',
           'Древний город Петра': 'old_peter.jpg',
           'Великая Китайская Стена': 'great_wall.jpg',
           'Эфес': 'efes.jpg', 'Альгамбра': 'algambra.jpg',
@@ -104,12 +103,11 @@ def load_image(name, colorkey=None):
     return image
 
 
-play_image = pygame.transform.scale(load_image('play.png'), (300, 100))
-rules_image = pygame.transform.scale(load_image('rules.png'), (300, 100))
-settings_image = pygame.transform.scale(load_image('settings.png'), (300, 100))
-mode_capitals_image = pygame.transform.scale(load_image('capitals.png'), (300, 100))
-mode_russian_cities_image = pygame.transform.scale(load_image('russian_cities.png'), (300, 100))
-mode_city_sights_image = pygame.transform.scale(load_image('city_sights.png'), (300, 100))
+russia_image = pygame.transform.scale(load_image('russia.jpg'), (200, 100))
+great_britain_image = pygame.transform.scale(load_image('great_britain.png'), (200, 100))
+translations = [['Играть', 'Play'], ['Правила', 'Rules'], ['Настройки', 'Settings'],
+                ['Столицы мира', 'Capitals'], ['Города России', 'Russian cities'],
+                ['Интересные места', 'Interesting places'], ['Назад', 'Back']]
 
 
 def terminate():
@@ -117,28 +115,15 @@ def terminate():
     sys.exit()
 
 
-def start_screen():
+def start_screen(lang):
     fon = pygame.transform.scale(load_image('fon.jpg'), (600, 500))
-    play = Play()
-    rules = Rules()
-    settings = Settings()
+    play = Play(lang)
+    rules = Rules(lang)
+    settings = Settings(lang)
     screen.blit(fon, (0, 0))
-    font = pygame.font.SysFont('bookmanoldstyle', 50)
     play_group.draw(screen)
     rules_group.draw(screen)
     settings_group.draw(screen)
-    string_rendered = font.render('Играть', 1, pygame.Color('white'))
-    intro_rect = string_rendered.get_rect()
-    intro_rect.x, intro_rect.top = play.rect.x + 65, play.rect.y + 20
-    screen.blit(string_rendered, intro_rect)
-    string_rendered = font.render('Правила', 1, pygame.Color('white'))
-    intro_rect = string_rendered.get_rect()
-    intro_rect.x, intro_rect.top = rules.rect.x + 45, rules.rect.y + 20
-    screen.blit(string_rendered, intro_rect)
-    string_rendered = font.render('Настройки', 1, pygame.Color('white'))
-    intro_rect = string_rendered.get_rect()
-    intro_rect.x, intro_rect.top = settings.rect.x + 15, settings.rect.y + 20
-    screen.blit(string_rendered, intro_rect)
     pygame.display.flip()
     while True:
         for event in pygame.event.get():
@@ -148,113 +133,94 @@ def start_screen():
                 a = play.get_event(event)
                 b = rules.get_event(event)
                 c = settings.get_event(event)
+                if a or b or c:
+                    play_group.remove(play)
+                    rules_group.remove(rules)
+                    settings_group.remove(settings)
                 if a:
-                    play_group.remove(play)
-                    rules_group.remove(rules)
-                    settings_group.remove(settings)
-                    mode = choose_mode()
-                    return mode
+                    mode, lang = choose_mode(lang)
+                    return mode, lang
                 elif b:
-                    play_group.remove(play)
-                    rules_group.remove(rules)
-                    settings_group.remove(settings)
-                    mode = rules_screen()
-                    return mode
+                    mode, lang = rules_screen(lang)
+                    return mode, lang
                 elif c:
-                    play_group.remove(play)
-                    rules_group.remove(rules)
-                    settings_group.remove(settings)
-                    mode = settings_screen()
-                    return mode
+                    mode, lang = settings_screen(lang)
+                    return mode, lang
         pygame.display.flip()
 
 
-def choose_mode():
+def choose_mode(lang):
     fon = pygame.transform.scale(load_image('fon.jpg'), (600, 500))
-    mode_capitals = ModeCapitals()
-    mode_russian_cities = ModeRussianCities()
-    mode_city_sights = ModeCitySights()
+    mode_capitals = ModeCapitals(lang)
+    mode_russian_cities = ModeRussianCities(lang)
+    mode_city_sights = ModeCitySights(lang)
     screen.blit(fon, (0, 0))
     mode_capitals_group.draw(screen)
     mode_city_sights_group.draw(screen)
     mode_russian_cities_group.draw(screen)
-    font = pygame.font.SysFont('bookmanoldstyle', 30)
     play_group.draw(screen)
     rules_group.draw(screen)
     settings_group.draw(screen)
-    string_rendered = font.render('Столицы мира', 1, pygame.Color('white'))
-    intro_rect = string_rendered.get_rect()
-    intro_rect.x, intro_rect.top = mode_capitals.rect.x + 40, mode_capitals.rect.y + 20
-    screen.blit(string_rendered, intro_rect)
-    string_rendered = font.render('Города России', 1, pygame.Color('white'))
-    intro_rect = string_rendered.get_rect()
-    intro_rect.x, intro_rect.top = mode_russian_cities.rect.x + 40, mode_russian_cities.rect.y + 20
-    screen.blit(string_rendered, intro_rect)
-    string_rendered = font.render('Интересные места', 1, pygame.Color('white'))
-    intro_rect = string_rendered.get_rect()
-    intro_rect.x, intro_rect.top = mode_city_sights.rect.x + 10, mode_city_sights.rect.y + 20
-    screen.blit(string_rendered, intro_rect)
     pygame.display.flip()
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                a = mode_capitals.get_event(event)
-                b = mode_russian_cities.get_event(event)
-                c = mode_city_sights.get_event(event)
-                mode = ''
-                if a:
+                mode = 0
+                if mode_capitals.get_event(event):
                     mode = 'capitals'
-                elif b:
+                elif mode_russian_cities.get_event(event):
                     mode = 'cities'
-                elif c:
+                elif mode_city_sights.get_event(event):
                     mode = 'sights'
-                if mode != '':
+                if mode:
                     mode_capitals_group.remove(mode_capitals)
                     mode_city_sights_group.remove(mode_city_sights)
                     mode_russian_cities_group.remove(mode_russian_cities)
-                    return mode
+                    return mode, lang
         pygame.display.flip()
 
 
-def rules_screen():
+def rules_screen(lang):
     fon = pygame.transform.scale(load_image('fon.jpg'), (600, 500))
     screen.blit(fon, (0, 0))
-    rules = Rules()
+    rules = Rules(lang)
     rules.rect = rules.image.get_rect().move(150, 320)
-    font = pygame.font.SysFont('bookmanoldstyle', 50)
     rules_group.draw(screen)
-    string_rendered = font.render('Назад', 1, pygame.Color('white'))
-    intro_rect = string_rendered.get_rect()
-    intro_rect.x, intro_rect.top = rules.rect.x + 70, rules.rect.y + 20
-    screen.blit(string_rendered, intro_rect)
     pygame.display.flip()
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                a = rules.get_event(event)
-                if a:
+                if rules.get_event(event):
                     rules_group.remove(rules)
-                    mode = start_screen()
-                    return mode
+                    mode, lang = start_screen(lang)
+                    return mode, lang
         pygame.display.flip()
 
 
-def settings_screen():
-    # тут будут настройки, пока не знаю какие
+def settings_screen(lang):
     fon = pygame.transform.scale(load_image('fon.jpg'), (600, 500))
     screen.blit(fon, (0, 0))
-    settings = Settings()
-    font = pygame.font.SysFont('bookmanoldstyle', 50)
+    settings = Settings(lang)
+    russia = Russia()
+    great_britain = GreatBritain()
+    done = pygame.sprite.Sprite(all_sprites, done_group)
+    done.image = load_image('done.png')
+    done.rect = done.image.get_rect()
+    if lang == 'ru':
+        done.rect.x = 200
+        done.rect.y = 80
+    else:
+        done.rect.x = 500
+        done.rect.y = 80
     settings.rect = settings.image.get_rect().move(150, 320)
     settings_group.draw(screen)
-    string_rendered = font.render('Назад', 1, pygame.Color('white'))
-    intro_rect = string_rendered.get_rect()
-    intro_rect.x, intro_rect.top = settings.rect.x + 70, settings.rect.y + 20
-    screen.blit(string_rendered, intro_rect)
+    russia_group.draw(screen)
+    great_britain_group.draw(screen)
+    done_group.draw(screen)
     pygame.display.flip()
     while True:
         for event in pygame.event.get():
@@ -262,24 +228,34 @@ def settings_screen():
                 terminate()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 a = settings.get_event(event)
-                if a:
+                b = russia.get_event(event)
+                c = great_britain.get_event(event)
+                if b:
+                    lang = 'ru'
+                elif c:
+                    lang = 'en'
+                if b or c:
                     settings_group.remove(settings)
-                    mode = start_screen()
-                    return mode
+                    russia_group.remove(russia)
+                    great_britain_group.remove(great_britain)
+                    done_group.remove(done)
+                    mode, lang = settings_screen(lang)
+                    return mode, lang
+                elif a:
+                    settings_group.remove(settings)
+                    russia_group.remove(russia)
+                    great_britain_group.remove(great_britain)
+                    done_group.remove(done)
+                    mode, lang = start_screen(lang)
+                    return mode, lang
+
         pygame.display.flip()
 
 
-def game(mode):
-    # пока что тут полежит котик
-    fon = pygame.transform.scale(load_image('cat.jpg'), (600, 500))
-    screen.blit(fon, (0, 0))
-    pygame.display.flip()
-
-
 class Play(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, lang):
         super().__init__(play_group, all_sprites)
-        self.image = play_image
+        self.image = pygame.transform.scale(load_image('play_' + lang + '.png'), (300, 100))
         self.rect = self.image.get_rect().move(150, 80)
 
     def get_event(self, event):
@@ -289,9 +265,9 @@ class Play(pygame.sprite.Sprite):
 
 
 class Rules(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, lang):
         super().__init__(rules_group, all_sprites)
-        self.image = rules_image
+        self.image = pygame.transform.scale(load_image('rules_' + lang + '.png'), (300, 100))
         self.rect = self.image.get_rect().move(150, 200)
 
     def get_event(self, event):
@@ -301,9 +277,9 @@ class Rules(pygame.sprite.Sprite):
 
 
 class Settings(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, lang):
         super().__init__(settings_group, all_sprites)
-        self.image = settings_image
+        self.image = pygame.transform.scale(load_image('settings_' + lang + '.png'), (300, 100))
         self.rect = self.image.get_rect().move(150, 320)
 
     def get_event(self, event):
@@ -313,9 +289,9 @@ class Settings(pygame.sprite.Sprite):
 
 
 class ModeCapitals(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, lang):
         super().__init__(mode_capitals_group, all_sprites)
-        self.image = mode_capitals_image
+        self.image = pygame.transform.scale(load_image('capitals_' + lang + '.png'), (300, 100))
         self.rect = self.image.get_rect().move(150, 80)
 
     def get_event(self, event):
@@ -325,9 +301,9 @@ class ModeCapitals(pygame.sprite.Sprite):
 
 
 class ModeRussianCities(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, lang):
         super().__init__(mode_russian_cities_group, all_sprites)
-        self.image = mode_russian_cities_image
+        self.image = pygame.transform.scale(load_image('russian_cities_' + lang + '.png'), (300, 100))
         self.rect = self.image.get_rect().move(150, 200)
 
     def get_event(self, event):
@@ -337,15 +313,40 @@ class ModeRussianCities(pygame.sprite.Sprite):
 
 
 class ModeCitySights(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, lang):
         super().__init__(mode_city_sights_group, all_sprites)
-        self.image = mode_city_sights_image
+        self.image = pygame.transform.scale(load_image('city_sights.png'), (300, 100))
         self.rect = self.image.get_rect().move(150, 320)
 
     def get_event(self, event):
         if self.rect.collidepoint(event.pos):
             return True
         return False
+
+
+class Russia(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(russia_group, all_sprites)
+        self.image = russia_image
+        self.rect = self.image.get_rect().move(50, 100)
+
+    def get_event(self, event):
+        if self.rect.collidepoint(event.pos):
+            return True
+        return False
+
+
+class GreatBritain(pygame.sprite.Sprite):
+    def __init__(self):
+        super().__init__(great_britain_group, all_sprites)
+        self.image = great_britain_image
+        self.rect = self.image.get_rect().move(350, 100)
+
+    def get_event(self, event):
+        if self.rect.collidepoint(event.pos):
+            return True
+        return False
+
 
 all_sprites = pygame.sprite.Group()
 play_group = pygame.sprite.Group()
@@ -354,6 +355,9 @@ settings_group = pygame.sprite.Group()
 mode_capitals_group = pygame.sprite.Group()
 mode_russian_cities_group = pygame.sprite.Group()
 mode_city_sights_group = pygame.sprite.Group()
+russia_group = pygame.sprite.Group()
+great_britain_group = pygame.sprite.Group()
+done_group = pygame.sprite.Group()
 
 
 def lonlat_distance(a, b):
@@ -405,7 +409,9 @@ class MapParams(object):
         self.route = ''
         self.use_postal_code = False
         self.answer = answer
-        self.max_zoom = 17 if self.answer.answer in sights else 13
+        self.answer_coordinates = self.answer.get_coordinates()
+        self.inaccuracy = 0
+        self.max_zoom = 17 if self.answer.answer in sights else 12
 
     def update(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
@@ -418,7 +424,11 @@ class MapParams(object):
                 self.type = 'sat,skl'
                 self.point = "&pt=" + ','.join([str(self.lon), str(self.lat), "pm2rdl"])
                 self.route = (f"&pl={','.join(self.point.replace('&pt=', '').split(',')[:-1])}," +
-                              self.answer.get_coordinates())
+                              self.answer_coordinates)
+                self.inaccuracy = lonlat_distance((self.lon, self.lat),
+                                                  tuple(map(float,
+                                                            self.answer_coordinates.split(','))))
+                print(self.inaccuracy)
 
             elif event.button == 4:
                 if self.zoom <= self.max_zoom:
@@ -480,18 +490,23 @@ def load_map(mp):
     return map_file
 
 
+def show_sight():
+    pass
+
+
 def main():
     global choose_game_mode
     pygame.init()
     screen = pygame.display.set_mode((600, 500))
     gamemode = None
     if choose_game_mode:
-        gamemode = start_screen()
+        gamemode, lang = start_screen('en')
 
     if gamemode == 'sights':
-        gamemode = 'list(sights.keys())'
-        screen = pygame.display.set_mode((600, 450))
-    answer = Answer(random.choice(eval(gamemode)), gamemode)
+        answer = Answer(random.choice(eval('list(sights.keys())')), gamemode)
+        show_sight(answer)
+    else:
+        answer = Answer(random.choice(eval(gamemode)), gamemode)
 
     mp = MapParams(answer)
     running = True
@@ -503,6 +518,11 @@ def main():
         map_file = load_map(mp)
 
         screen.blit(pygame.image.load(map_file), (0, 0))
+        if gamemode != 'sights':
+            pygame.draw.rect(screen, (152, 200, 220), (0, 450, 600, 500))
+            screen.blit(pygame.font.SysFont('Impact Thin', 40).render(answer.answer, 1,
+                                                                      (30, 48, 134)), (10, 460))
+
         pygame.display.flip()
 
     pygame.quit()
