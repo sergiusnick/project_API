@@ -7,6 +7,7 @@ It is a fun way to solve geographical problems of finding
 a specific subject on the map of the world.
 
 Here's a quick look on what is presented in the game:
+
         You start in the main menu.
         
         You may exit the game anytime.
