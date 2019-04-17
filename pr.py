@@ -1,14 +1,16 @@
 # -*- coding: utf8 -*-
-import math
+
 import pygame
 import random
 import requests
 import sys
 import os
+import math
 
 pygame.init()
 screen = pygame.display.set_mode((600, 500))
-timer = 300
+timer = 60
+points = 0
 guessed = []
 
 choose_game_mode = True
@@ -116,11 +118,17 @@ russia_image = load_image('russia.png')
 great_britain_image = load_image('great_britain.png')
 translations = [['Играть', 'Play'], ['Правила', 'Rules'], ['Настройки', 'Settings'],
                 ['Столицы мира', 'Capitals'], ['Города России', 'Russian cities'],
-                ['Интересные места', 'Interesting places'], ['Назад', 'Back']]
+                ['Интересные места', 'Interesting places'], ['Назад', 'Back'],
+                ['Игра Окончена', 'Game Over'], ['Счёт:', 'Score:'],
+                ['Лучший счет:', 'High score:']]
 
 
 def terminate():
     pygame.quit()
+    try:
+        os.remove('map.png')
+    except:
+        pass
     sys.exit()
 
 
@@ -188,15 +196,19 @@ def choose_mode(lang):
                     mode_city_sights_group.remove(mode_city_sights)
                     mode_russian_cities_group.remove(mode_russian_cities)
                     return mode, lang
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    start_screen(lang)
         pygame.display.flip()
 
 
 def rules_screen(lang):
-    fon = pygame.transform.scale(load_image('fon.jpg'), (600, 500))
+    fon = load_image('rules_' + lang + '.jpg')
     screen.blit(fon, (0, 0))
     back = Back(lang)
     back.rect = back.image.get_rect().move(150, 320)
     back_group.draw(screen)
+    pygame.draw.rect(screen, (30, 48, 134), (180, 295, 300, 20))
     pygame.display.flip()
     while True:
         for event in pygame.event.get():
@@ -447,9 +459,7 @@ class MapParams(object):
         self.type = "sat"
         self.geoscreen = self.screen_to_geo()
         self.point = ""
-        self.postal = ''
         self.route = ''
-        self.use_postal_code = False
         self.answer = answer
         self.answer_coordinates = self.answer.get_coordinates()
         self.inaccuracy = 0
@@ -468,6 +478,7 @@ class MapParams(object):
                 self.point = "&pt=" + ','.join([str(self.lon), str(self.lat), "pm2rdl"])
                 self.route = (f"&pl={','.join(self.point.replace('&pt=', '').split(',')[:-1])}," +
                               self.answer_coordinates)
+                self.point += '~' + self.answer_coordinates + ',pm2gnl'
                 self.inaccuracy = lonlat_distance((self.lon, self.lat),
                                                   tuple(map(float,
                                                             self.answer_coordinates.split(','))))
@@ -494,7 +505,7 @@ class MapParams(object):
                 move = self.lon + direction * self.geoscreen[0]
                 self.lon = [move if abs(move) < 180 else move + -1 * direction * 360][0]
 
-    def screen_to_geo(self, width=600, height=450):
+    def screen_to_geo(self, width=200, height=150):
         dx = width * 0.0000428 * math.pow(2, 15 - self.zoom)
         dy = height * 0.0000428 * math.cos(math.radians(self.lat)) * math.pow(2, 15 - self.zoom)
         return dx, dy
@@ -549,6 +560,55 @@ def show_sight(sight):
                 return  # начинаем игру
 
 
+def results(lang):
+    global timer
+    global points
+    global choose_game_mode
+    try:
+        with open(os.path.join('data', 'record.txt'), 'r') as r:
+            record = r.read()
+    except:
+        record = '0'
+
+    if int(record) < points:
+        record = str(points)
+    with open(os.path.join('data', 'record.txt'), 'w') as r:
+        r.write(record)
+    fon = load_image('gameover.jpg')
+    screen.blit(fon, (10, -30))
+
+    back = Back(lang)
+    back_group.draw(screen)
+    if lang == 'ru':
+        number = 0
+    else:
+        number = 1
+    pygame.draw.rect(screen, (152, 200, 220), (0, 450, 600, 50))
+    pygame.draw.rect(screen, (152, 200, 220), (0, 0, 10, 500))
+    screen.blit(pygame.font.SysFont('Times New Roman', 35).render(
+        translations[8][number] + ' ' * len(str(points)) + str(points), 1, (30, 48, 134)),
+        (160, 190))
+    screen.blit(
+        pygame.font.SysFont('Times New Roman', 35).render(
+            translations[9][number] + ' ' * len(record) + record,
+            1, (30, 48, 134)), (160, 240))
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                os.remove('map.png')
+                terminate()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if back.get_event(event):
+                    back_group.remove(back)
+                    points = 0
+                    return
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    timer = 60
+                    return
+        pygame.display.flip()
+
+
 def main():
     global choose_game_mode
     global timer
@@ -556,12 +616,21 @@ def main():
     pygame.init()
     screen = pygame.display.set_mode((600, 500))
     gamemode = None
-    if choose_game_mode:
-        gamemode, lang = start_screen('en')
+    lang = 'en'
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+        if choose_game_mode:
+            gamemode, lang = start_screen(lang)
 
-    result = game(gamemode, lang, screen)
-    while result == 'next':
         result = game(gamemode, lang, screen)
+        while result == 'next':
+            result = game(gamemode, lang, screen)
+        results(lang)
+        choose_game_mode = True
+
     pygame.quit()
     os.remove('map.png')
 
@@ -569,18 +638,28 @@ def main():
 def game(gamemode, lang, screen):
     global timer
     global guessed
+    global points
+    ended = False
 
     pygame.time.set_timer(1, 10)
 
     if gamemode == 'sights':
         answer = Answer(random.choice(eval('list(sights.keys())')), gamemode, lang)
         while answer.answer[-1] in guessed:
+            if len(guessed) == len(eval('list(sights.keys())')):
+                results(lang)
+                return
             answer = Answer(random.choice(eval('list(sights.keys())')), gamemode, lang)
         guessed.append(answer.answer[-1])
         show_sight(answer)
     else:
         answer = Answer(random.choice(eval(gamemode)), gamemode, lang)
-
+        while answer.answer[-1] in guessed:
+            if len(guessed) == len(eval(gamemode)):
+                results(lang)
+                return
+            answer = Answer(random.choice(eval(gamemode)), gamemode, lang)
+        guessed.append(answer.answer[-1])
     mp = MapParams(answer)
     running = True
     pygame.draw.rect(screen, (152, 200, 220), (0, 450, 600, 500))
@@ -590,6 +669,8 @@ def game(gamemode, lang, screen):
                 return 'next'
             elif event.type == pygame.QUIT:
                 running = False
+                os.remove('map.png')
+                terminate()
             elif event.type == 1 and not mp.finished:
                 timer -= 0.01
             mp.update(event)
@@ -601,21 +682,31 @@ def game(gamemode, lang, screen):
             screen.blit(pygame.font.SysFont('Times New Roman', 35).render(answer.answer[0], 1,
                                                                           (200, 200, 200)),
                         (10, 20))
-        if mp.finished:
+        if mp.finished and not ended:
+            ended = True
             screen.blit(pygame.font.SysFont('Times New Roman', 30).render(
                 ('You missed it by {} km' if lang == 'en' else 'Вы ошиблись на {} км').format(
                     str(int(mp.inaccuracy) // 1000)), 1, (30, 48, 134)), (10, 455))
+            points += int((100000 - int(mp.inaccuracy) // 1000) * 0.0001)
+
             if gamemode == 'sights':
-                screen.blit(pygame.font.SysFont('Times New Roman', 35).render(answer.answer[0], 1,
-                                                                              (200, 200, 200)),
-                            (10, 20))
-        if timer == 0:
-            return True
+                if len(answer.answer[0]) > 25:
+                    answer.answer[0] = answer.answer[0].split()
+                    screen.blit(pygame.font.SysFont('Times New Roman', 35).render(
+                        ' '.join(answer.answer[0][:2]), 1, (200, 200, 200)), (10, 20))
+                    screen.blit(pygame.font.SysFont('Times New Roman', 35).render(
+                        ' '.join(answer.answer[0][2:]), 1, (200, 200, 200)), (10, 60))
+                    answer.answer[0] = ' '.join(answer.answer[0])
+                else:
+                    screen.blit(pygame.font.SysFont('Times New Roman', 35).render(
+                        answer.answer[0], 1, (200, 200, 200)), (10, 20))
 
         screen.blit(pygame.font.SysFont('Times New Roman', 35).render(str(int(timer) // 60) + ':' +
                                                                       str(int(timer) % 60).zfill(2),
                                                                       1, (200, 200, 200)), (520,
                                                                                             20))
+        if (int(timer) // 60) <= 0 and (int(timer) % 60) <= 0 or timer < 0:
+            running = False
 
         pygame.display.flip()
     return
