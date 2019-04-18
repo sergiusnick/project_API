@@ -9,7 +9,6 @@ import math
 
 pygame.init()
 screen = pygame.display.set_mode((600, 500))
-timer = 60
 points = 0
 guessed = []
 
@@ -625,6 +624,7 @@ def main():
         if choose_game_mode:
             gamemode, lang = start_screen(lang)
 
+        timer = 60
         result = game(gamemode, lang, screen)
         while result == 'next':
             result = game(gamemode, lang, screen)
