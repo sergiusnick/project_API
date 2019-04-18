@@ -1,4 +1,5 @@
-# Cities. The game.
+# Cities. The game. Version 1.0.0 17/04/2019
+# E-mail: elizaveta.yermakova@gmail.com, KatKollare@yandex.ru
 
 This game is somewhat used to bring geographical educaton
 into the minds of the young and old.
