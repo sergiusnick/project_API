@@ -647,7 +647,6 @@ def results(lang):
 def main():
     global choose_game_mode
     global timer
-    timer = 60
 
     pygame.init()
     screen = pygame.display.set_mode((600, 500))
@@ -659,6 +658,7 @@ def main():
             if event.type == pygame.QUIT:
                 running = False
         if choose_game_mode:
+            timer = 12
             gamemode, lang = start_screen(lang)
 
         result = game(gamemode, lang, screen)
