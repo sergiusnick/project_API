@@ -52,4 +52,7 @@ Here's a quick look on what is presented in the game:
        
 Quick look finished. Done. This is about it, really. Indeed, good luck! 
 Speak thine heart's desire!
+
+# Установка зависимостей
+pip install -r requirements.txt
         
